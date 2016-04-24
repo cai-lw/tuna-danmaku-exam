@@ -32,7 +32,7 @@ try:
             print("=========== Examine-free channel, closing ==========")
             exit()
 except requests.RequestException:
-    print("=========== Network error, closing ==========")
+    print("=========== Connection error, closing ==========")
     exit()
 print("========== Test passed, start listening ==========")
 
@@ -46,6 +46,10 @@ while True:
         request_exception = e
     if request_exception or resp.status_code != 200:
         print("Fetch failed, retrying.")
+        if request_exception:
+            print("Connection Error.")
+        else:
+            print("Server Error. Status code:", resp.status_code)
         sleep(sleep_time)
         if sleep_time < 5:
             sleep_time += 1
@@ -56,6 +60,7 @@ while True:
         if sleep_time < 5:
             sleep_time += 1
         continue
+    sleep_time = 0
     for dmk in dmks:
         print('========== Danmaku begin =========')
         try:
