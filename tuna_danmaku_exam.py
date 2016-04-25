@@ -73,7 +73,30 @@ while True:
         while True:
             cmd = input("Press Enter to ACCEPT. Input 'x' to REJECT. Input 'c' to show style:")
             if cmd == "":
-                post_dmk(make_dmk(dmk["text"], dmk["style"], dmk["position"]))
+                while True:
+                    request_exception = None
+                    try:
+                        resp = post_dmk(make_dmk(dmk["text"], dmk["style"], dmk["position"]))
+                    except requests.RequestException as e:
+                        request_exception = e
+                    if request_exception or resp.status_code != 200:
+                        print("Post failed.")
+                        if request_exception:
+                            print("Connection Error.")
+                        else:
+                            print("Server Error. Status code:", resp.status_code)
+                        while True:
+                            retry_cmd = input("Press Enter to retry. Input 'z' to discard this danmaku.")
+                            if retry_cmd == "":
+                                retry = True
+                                break
+                            elif retry_cmd.lower() == "z":
+                                retry = False
+                                break
+                        if not retry:
+                            break
+                    else:
+                        break
                 print(' <ACCEPT>', file=log, flush=True)
                 break
             elif cmd.lower() == 'x':
